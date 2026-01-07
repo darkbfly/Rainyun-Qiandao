@@ -1,0 +1,40 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  # 👇 替换为你在 docker-compose.yml 中 rainyun-qiandao 服务的 image 名称
+  IMAGE_NAME: darkbfly/rainyun-qiandao
+  TAG: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      # 👇 构建并推送，使用 compose 中 rainyun-qiandao 的构建上下文（可选）
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .                             # 或指定子目录，如 ./qiandao
+          file: ./Dockerfile.qiandao             # 如果用了非默认 Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+            ${{ env.IMAGE_NAME }}:latest
