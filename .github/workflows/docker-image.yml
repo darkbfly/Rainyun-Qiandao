@@ -33,7 +33,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .                             # 或指定子目录，如 ./qiandao
-          file: ./Dockerfile.qiandao             # 如果用了非默认 Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ env.TAG }}
